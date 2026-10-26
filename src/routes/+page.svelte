@@ -1,74 +1,52 @@
 <script>
-    // Import the reusable Quote component.
-    // Each quote will use the same design and buttons.
     import Quote from '#lib/components/Quote.svelte';
+
+    let myQuotes = [
+        { id:"1", author: "Paul Opitz", text: "Don't be Captain Obvious!" },
+        { id:"2", author: "Gandalf", text: "You shall not pass!" },
+        { id:"3", author: "Bilbo Baggins", text: "Not all those who wander are lost." },
+        { id:"4", author: "Eminem", text: "Hi, my name is, what? My name is, who? My name is, chka-chka, Slim Shady." },
+        { id:"5", author: "Shkodra Elektronike", text: "Njerëzit e mirë e njerëzit pa emër, kërcejnë valle n'shpirt. Jarnane ti toka ime, ku kam lindë s'do të harroj." }
+    ]
+
+    function dragstart (event) {
+        event.dataTransfer.setData("text/plain",event.target.innerText);
+    };
+
+    function dragover (event) {
+        event.preventDefault();
+        event.currentTarget.classList.add("bg-green-200");
+    };
+
+    function drop (event) {
+        event.preventDefault();
+        let id = event.dataTransfer.getData("text/plain");
+        const dragegedItem = document.getElementById(id);
+        console.log("Dropped data:", dragegedItem);
+        event.currentTarget.appendChild(dragegedItem);
+        event.currentTarget.classList.remove("bg-green-200");
+    };
 </script>
+ 
+<h1 class="text-center text-4xl m-6">Data Exchange</h1>
+ 
+<main class="flex">
+ 
+    <div class="flex flex-col gap-4 p-4 bg-red-100 w-1/2" ondragover={dragover} ondrop={drop}>
 
-<svelte:head>
-    <!-- Set the title shown in the browser tab. -->
-    <title>Data Exchange | Quotes</title>
-
-    <!-- Describe the page for search engines. -->
-    <meta
-        name="description"
-        content="Five inspirational quotes to copy and share."
-    />
-</svelte:head>
-
-<!-- Main page container with a light background and spacing. -->
-<main class="min-h-screen bg-slate-100 px-4 py-12 text-slate-800 sm:px-6">
-    <!-- Keep the content centered and prevent it from becoming too wide. -->
-    <div class="mx-auto max-w-3xl">
-
-        <!-- Page heading and short introduction. -->
-        <header class="mb-10 text-center">
-            <p class="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-teal-700">
-                Words to remember
-            </p>
-
-            <h1 class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                Data Exchange
-            </h1>
-
-            <p class="mt-4 text-base text-slate-600">
-                Five quotes worth sharing.
-            </p>
-        </header>
-
-        <!-- Display all five quotes with consistent spacing. -->
-        <section class="space-y-5">
-
-            <!-- First quote. -->
-            <Quote author="Abraham Lincoln">
-                My dream is of a place and a time where America will once again be seen as the last best hope of earth.
-            </Quote>
-
-            <!-- Second quote. -->
-            <Quote author="Oscar Wilde">
-                Be yourself; everyone else is already taken.
-            </Quote>
-
-            <!-- Third quote. -->
-            <Quote author="Albert Einstein">
-                Imagination is more important than knowledge.
-            </Quote>
-
-            <!-- Fourth quote. -->
-            <Quote author="Mahatma Gandhi">
-                Be the change that you wish to see in the world.
-            </Quote>
-
-            <!-- Fifth quote. -->
-            <Quote author="Mark Twain">
-                The secret of getting ahead is getting started.
-            </Quote>
-
-        </section>
-
-        <!-- Small footer at the bottom of the page. -->
-        <footer class="mt-10 text-center text-sm text-slate-500">
-            Choose a quote and share a little inspiration.
-        </footer>
-
+        {#each myQuotes as quote}
+            <div draggable="true" ondragstart={dragstart} class="cursor-grab">
+                <Quote author={quote.author}>
+                {quote.text}
+                </Quote>
+            </div>
+        {/each}
     </div>
+ 
+    <div class="flex flex-col gap-4 p-4 bg-green-100 w-1/2">
+ 
+    </div>
+ 
+  
+ 
 </main>
