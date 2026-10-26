@@ -1,48 +1,42 @@
 <script>
-    // Receive the author and quote content from the parent component.
-    // Svelte 5 uses $props() to access component properties.
+
+    // Get the author and quote content from the parent component.
     let { author, children } = $props();
 
-    // Store a reference to the blockquote HTML element.
-    // This allows us to access the displayed quote text.
+    // Reference the HTML element containing the quote.
     let quote;
 
-    // Copy the quote and its author to the clipboard.
+    // Copy the quote and show a system notification.
     async function copyQuote() {
-        // Combine the quote and author into one text string.
         const text = `${quote.textContent.trim()}\n— ${author}`;
 
-        try {
-            // Copy the text using the browser Clipboard API.
-            await navigator.clipboard.writeText(text);
-        } catch (error) {
-            // Display an error if copying is not possible.
-            console.error('Could not copy quote:', error);
+        await navigator.clipboard.writeText(text);
+
+        // Request permission if it has not been decided yet.
+        if (Notification.permission === 'default') {
+            await Notification.requestPermission();
+        }
+
+        // Show a notification through the operating system.
+        if (Notification.permission === 'granted') {
+            new Notification('Quote copied!', {
+                body: `The quote by ${author} was copied.`
+            });
         }
     }
 
-    // Share the quote using the device's available sharing options.
+    // Share the quote using the browser's sharing feature.
     async function shareQuote() {
-        // Include the author so the quote has its source.
         const text = `${quote.textContent.trim()}\n— ${author}`;
 
-        try {
-            // Use the native sharing menu when the browser supports it.
-            if (navigator.share) {
-                await navigator.share({
-                    title: `Quote by ${author}`,
-                    text: text
-                });
-            } else {
-                // If native sharing is unavailable, copy the quote instead.
-                await navigator.clipboard.writeText(text);
-            }
-        } catch (error) {
-            // Ignore the error if the user cancels the sharing menu.
-            // Report other errors in the browser console.
-            if (error.name !== 'AbortError') {
-                console.error('Could not share quote:', error);
-            }
+        if (navigator.share) {
+            await navigator.share({
+                title: `Quote by ${author}`,
+                text
+            });
+        } else {
+            // Copy the quote if sharing is not supported.
+            await copyQuote();
         }
     }
 </script>
